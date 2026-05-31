@@ -96,8 +96,66 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useRef, useMemo } = React;
+    const { useState, useEffect, useRef, useMemo, useContext } = React;
     const { motion, useInView, useScroll, useTransform, AnimatePresence } = window.Motion;
+
+    const translations = {
+      en: {
+        nav: { home: 'Home', services: 'Services', projects: 'Projects', gallery: 'Gallery', testimonials: 'Testimonials', contact: 'Contact' },
+        hero: { badgeLabel: 'Premium', badgeText: 'Commercial & Residential Service', title: 'The Perfect Air for Your Home in Houston', desc: 'Experts in AC repair, maintenance, and Minisplit installation. Absolute comfort with a professional, serious, and reliable style.', btnServices: 'View Services', btnContact: 'Contact Us Now' },
+        marquee: { subtitle: 'Certified to install & service', services: ["AC Repair", "Minisplit Installation", "Preventive Maintenance", "Heating", "Cooling"] },
+        services: { subtitle: 'Our Specialty', title: 'Climate Solutions', items: [
+            { title: "AC Repair", desc: "Fast diagnosis and precise repair. Don't suffer the heat, we fix it the same day." },
+            { title: "Minisplit Install", desc: "High-efficiency ductless systems. Perfect zoning without breaking walls." },
+            { title: "Maintenance", desc: "Extend your equipment's lifespan and save energy with our annual plans." },
+            { title: "Heating", desc: "Heat pumps and furnaces ready to protect your family from the Texas winter." },
+            { title: "Cooling", desc: "Latest generation central systems for total and silent comfort." }
+        ]},
+        stats: { title1: 'Licensed, Insured, ', title2: 'Houston-Proven', items: ["Installations", "Availability", "Years Experience", "Licensed & Insured"] },
+        gallery: { subtitle: 'Our Work', title: 'Projects & Gallery', mainTitle: 'Commercial & Residential Installation', mainDesc: 'Professional and high-quality work guaranteed. Detailed inspection, precise diagnosis, and flawless installation on roofs and residential areas throughout Houston.', btnDetails: 'See more details' },
+        testimonials: { title: 'What our clients say', reviews: [
+            { name: "Michael T.", text: "Fast, clean, and very professional. They solved my problem the same day." },
+            { name: "Sarah J.", text: "Installed 3 minisplits in my office. Impeccable work and super quiet equipment." },
+            { name: "David R.", text: "Excellent maintenance service. You can tell the difference in air quality and my power bill." }
+        ]},
+        contact: { support: '24/7 Support', title: 'Schedule Your Visit', desc: 'Our experts are ready to assist you anywhere in Houston. No obligation quotes.', phoneTitle: 'Phone / WhatsApp', areaTitle: 'Service Area', areaDesc: 'Houston, TX & Surrounding Areas', form: { name: 'Name', phone: 'Phone', email: 'Email', message: 'How can we help you?', submit: 'Send Message' } },
+        cta: { title: 'Ready to Fix Your Comfort?', desc: 'Free estimates on all installations. No hidden fees. Financing available.', btn: 'Schedule Your Free Estimate', tags: ['Licensed & Insured', 'Serving all of Greater Houston', 'Hablamos Español'] },
+        footer: { desc: 'Expert HVAC services in Houston, TX. Delivering premium comfort, high efficiency, and reliable installations since day one.', contactTitle: 'Contact Us', rights: 'All rights reserved.', designed: 'Designed for excellence.' }
+      },
+      es: {
+        nav: { home: 'Inicio', services: 'Servicios', projects: 'Proyectos', gallery: 'Galería', testimonials: 'Testimonios', contact: 'Contacto' },
+        hero: { badgeLabel: 'Premium', badgeText: 'Servicio Comercial y Residencial', title: 'El Aire Perfecto para tu Hogar en Houston', desc: 'Expertos en reparación, mantenimiento e instalación de Minisplit. Confort absoluto con estilo profesional, serio y confiable.', btnServices: 'Ver Servicios', btnContact: 'Contáctanos Ahora' },
+        marquee: { subtitle: 'Certificados para instalar y reparar', services: ["Reparación de AC", "Instalación Minisplit", "Mantenimiento Preventivo", "Calefacción", "Enfriamiento"] },
+        services: { subtitle: 'Nuestra Especialidad', title: 'Soluciones Climáticas', items: [
+            { title: "Reparación de AC", desc: "Diagnóstico rápido y reparación precisa. No pases calor, solucionamos tu problema el mismo día." },
+            { title: "Instalación Minisplit", desc: "Sistemas ductless de alta eficiencia. Zonificación perfecta sin romper paredes." },
+            { title: "Mantenimiento", desc: "Extiende la vida útil de tus equipos y ahorra energía con nuestros planes anuales." },
+            { title: "Calefacción", desc: "Bombas de calor y furnaces listos para proteger a tu familia del invierno en Texas." },
+            { title: "Enfriamiento", desc: "Sistemas centrales de última generación para un confort total y silencioso." }
+        ]},
+        stats: { title1: 'Licenciados, Asegurados, ', title2: 'Probados en Houston', items: ["Instalaciones", "Disponibilidad", "Años Experiencia", "Licenciados y Asegurados"] },
+        gallery: { subtitle: 'Nuestro Trabajo', title: 'Proyectos y Galería', mainTitle: 'Instalación Comercial y Residencial', mainDesc: 'Trabajo profesional y de alta calidad garantizado. Inspección detallada, diagnóstico preciso e instalación impecable en techos y áreas residenciales en todo Houston.', btnDetails: 'Ver más detalles' },
+        testimonials: { title: 'Lo que dicen nuestros clientes', reviews: [
+            { name: "Michael T.", text: "Rápidos, limpios y muy profesionales. Solucionaron mi problema el mismo día." },
+            { name: "Sarah J.", text: "Instalaron 3 minisplits en mi oficina. El trabajo impecable y los equipos son súper silenciosos." },
+            { name: "David R.", text: "Excelente servicio de mantenimiento. Se nota la diferencia en la calidad del aire y en mi recibo de luz." }
+        ]},
+        contact: { support: 'Soporte 24/7', title: 'Agenda tu Visita', desc: 'Nuestros expertos están listos para asistirte en todo Houston. Cotización sin compromiso.', phoneTitle: 'Teléfono / WhatsApp', areaTitle: 'Área de Servicio', areaDesc: 'Houston, TX y Alrededores', form: { name: 'Nombre', phone: 'Teléfono', email: 'Correo', message: '¿En qué podemos ayudarte?', submit: 'Enviar Mensaje' } },
+        cta: { title: '¿Listo para Mejorar tu Confort?', desc: 'Estimaciones gratis en instalaciones. Sin cuotas ocultas. Financiamiento disponible.', btn: 'Agenda tu Estimado Gratis', tags: ['Licenciados y Asegurados', 'Sirviendo a todo Houston', 'Se Habla Español'] },
+        footer: { desc: 'Servicios expertos de HVAC en Houston, TX. Brindando confort premium, alta eficiencia e instalaciones confiables desde el primer día.', contactTitle: 'Contáctanos', rights: 'Todos los derechos reservados.', designed: 'Diseñado para la excelencia.' }
+      }
+    };
+
+    const LanguageContext = React.createContext();
+
+    function LanguageProvider({ children }) {
+      const [lang, setLang] = useState('en');
+      return (
+        <LanguageContext.Provider value={{ lang, setLang, t: translations[lang] }}>
+          {children}
+        </LanguageContext.Provider>
+      );
+    }
 
     // Suppress benign Framer Motion warnings
     const originalConsoleError = console.error;
@@ -180,6 +238,7 @@
 
     // --- Navbar ---
     function Navbar() {
+      const { lang, setLang, t } = useContext(LanguageContext);
       const [scrolled, setScrolled] = useState(false);
       const [menuOpen, setMenuOpen] = useState(false);
 
@@ -189,7 +248,13 @@
         return () => window.removeEventListener('scroll', handleScroll);
       }, []);
 
-      const navLinks = ['Inicio', 'Servicios', 'Proyectos', 'Galería', 'Testimonials'];
+      const navLinks = [
+        { id: 'inicio', label: t.nav.home },
+        { id: 'servicios', label: t.nav.services },
+        { id: 'proyectos', label: t.nav.projects },
+        { id: 'galeria', label: t.nav.gallery },
+        { id: 'testimonials', label: t.nav.testimonials }
+      ];
 
       return (
         <>
@@ -203,24 +268,39 @@
             {/* Center Links (Desktop) */}
             <div className="hidden lg:flex liquid-glass px-2 py-1 items-center gap-1 rounded-full">
               {navLinks.map((item) => (
-                <a key={item} href={`#${item.toLowerCase()}`} className="px-4 py-2 text-sm font-medium text-gray-700 font-body hover:text-[#00B4FF] transition-colors rounded-full hover:bg-white/50">
-                  {item}
+                <a key={item.id} href={`#${item.id}`} className="px-4 py-2 text-sm font-medium text-gray-700 font-body hover:text-[#00B4FF] transition-colors rounded-full hover:bg-white/50">
+                  {item.label}
                 </a>
               ))}
+              <div className="w-[1px] h-4 bg-gray-300 mx-2"></div>
+              <button 
+                onClick={() => setLang(lang === 'en' ? 'es' : 'en')} 
+                className="px-3 py-2 text-xs font-bold font-body text-gray-500 hover:text-[#00B4FF] transition-colors tracking-widest"
+              >
+                {lang === 'en' ? 'EN | ESP' : 'ESP | EN'}
+              </button>
               <a href="#contacto" className="bg-[#1A1A1A] text-white px-5 py-2 text-sm font-medium font-body rounded-full ml-2 shadow-md hover:bg-black transition-colors flex items-center gap-2">
-                Contacto
+                {t.nav.contact}
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 17L17 7M7 7h10v10"/></svg>
               </a>
             </div>
 
-            {/* Right Spacer / Mobile button */}
-            <button onClick={() => setMenuOpen(!menuOpen)} className="liquid-glass-strong h-14 w-14 rounded-full flex items-center justify-center lg:hidden z-50 relative cursor-pointer hover:bg-white/50 transition-colors">
-              {menuOpen ? (
-                <svg className="w-6 h-6 text-[#FF3C00]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-              ) : (
-                <svg className="w-6 h-6 text-gray-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-              )}
-            </button>
+            {/* Right Spacer / Mobile Actions */}
+            <div className="flex items-center gap-2 lg:hidden z-50 relative">
+              <button 
+                onClick={() => setLang(lang === 'en' ? 'es' : 'en')} 
+                className="liquid-glass-strong h-10 px-4 rounded-full text-xs font-bold font-body text-gray-800 hover:text-[#00B4FF] transition-colors shadow-sm"
+              >
+                {lang === 'en' ? 'ESP' : 'ENG'}
+              </button>
+              <button onClick={() => setMenuOpen(!menuOpen)} className="liquid-glass-strong h-14 w-14 rounded-full flex items-center justify-center cursor-pointer hover:bg-white/50 transition-colors">
+                {menuOpen ? (
+                  <svg className="w-6 h-6 text-[#FF3C00]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                ) : (
+                  <svg className="w-6 h-6 text-gray-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                )}
+              </button>
+            </div>
             <div className="hidden lg:block w-14 h-14"></div>
           </nav>
 
@@ -234,14 +314,20 @@
                 className="fixed inset-0 z-40 bg-white/95 backdrop-blur-xl flex flex-col justify-center items-center lg:hidden"
               >
                 <div className="flex flex-col gap-6 text-center">
+                  <button 
+                    onClick={() => setLang(lang === 'en' ? 'es' : 'en')} 
+                    className="font-heading italic text-3xl text-[#00B4FF] transition-colors mb-4 border border-[#00B4FF] rounded-full px-6 py-2"
+                  >
+                    {lang === 'en' ? 'Cambiar a Español' : 'Switch to English'}
+                  </button>
                   {navLinks.map((item) => (
                     <a 
-                      key={item} 
-                      href={`#${item.toLowerCase()}`} 
+                      key={item.id} 
+                      href={`#${item.id}`} 
                       onClick={() => setMenuOpen(false)}
                       className="font-heading italic text-4xl text-[#1A1A1A] hover:text-[#00B4FF] transition-colors"
                     >
-                      {item}
+                      {item.label}
                     </a>
                   ))}
                   <a 
@@ -249,7 +335,7 @@
                     onClick={() => setMenuOpen(false)}
                     className="mt-8 bg-gradient-to-r from-[#00B4FF] to-[#FF3C00] text-white px-10 py-4 text-xl font-bold font-body rounded-full shadow-xl shadow-blue-500/20"
                   >
-                    Contacto
+                    {t.nav.contact}
                   </a>
                 </div>
               </motion.div>
@@ -261,6 +347,7 @@
 
     // --- Hero Section ---
     function Hero() {
+      const { t } = useContext(LanguageContext);
       return (
         <section id="inicio" className="relative w-full min-h-[100vh] flex flex-col justify-center items-center overflow-hidden bg-gradient-to-b from-[#F8F9FA] to-white pt-24">
           <ParticleSystem />
@@ -273,12 +360,12 @@
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
                 className="liquid-glass rounded-full px-4 py-1.5 inline-flex items-center gap-3 mb-8"
               >
-                <span className="bg-[#00B4FF] text-white px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Premium</span>
-                <span className="text-xs font-body font-semibold text-gray-600 uppercase tracking-widest">Servicio Comercial & Residencial</span>
+                <span className="bg-[#00B4FF] text-white px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">{t.hero.badgeLabel}</span>
+                <span className="text-xs font-body font-semibold text-gray-600 uppercase tracking-widest">{t.hero.badgeText}</span>
               </motion.div>
 
               <BlurText 
-                text="El Aire Perfecto para tu Hogar en Houston"
+                text={t.hero.title}
                 className="font-heading italic text-5xl md:text-7xl lg:text-[6rem] text-[#1A1A1A] leading-[0.9] tracking-[-2px] max-w-2xl"
               />
 
@@ -286,7 +373,7 @@
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
                 className="mt-6 text-lg md:text-xl text-gray-600 max-w-xl font-body font-light leading-relaxed"
               >
-                Expertos en reparación, mantenimiento e instalación de Minisplit. Confort absoluto con estilo profesional, serio y confiable.
+                {t.hero.desc}
               </motion.p>
 
               <motion.div 
@@ -294,11 +381,11 @@
                 className="flex flex-wrap justify-center lg:justify-start gap-4 mt-10"
               >
                 <a href="#servicios" className="liquid-glass-strong rounded-full px-8 py-4 text-base font-bold text-[#1A1A1A] hover:bg-white transition-all flex items-center gap-2 group shadow-lg shadow-blue-500/10">
-                  Ver Servicios
+                  {t.hero.btnServices}
                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </a>
                 <a href="#contacto" className="bg-gradient-to-r from-[#00B4FF] to-[#FF3C00] rounded-full px-8 py-4 text-base font-bold text-white shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                  Contáctanos Ahora
+                  {t.hero.btnContact}
                 </a>
               </motion.div>
             </div>
@@ -333,9 +420,8 @@
 
     // --- Infinite Marquee ---
     function InfiniteMarquee() {
-      const services = [
-        "Reparación de AC", "Instalación Minisplit", "Mantenimiento Preventivo", "Calefacción", "Enfriamiento"
-      ];
+      const { t } = useContext(LanguageContext);
+      const services = t.marquee.services;
       
       const MarqueeBlock = () => (
         <div className="flex shrink-0 items-center justify-around gap-12 md:gap-24 px-6 md:px-12">
@@ -354,7 +440,7 @@
         <section className="py-12 bg-white relative z-10 border-b border-gray-100 overflow-hidden">
           <div className="text-center mb-8 relative z-20">
             <span className="text-xs md:text-sm font-body font-bold tracking-[0.2em] text-gray-400 uppercase bg-white px-4">
-              Certified to install & service
+              {t.marquee.subtitle}
             </span>
           </div>
           {/* Fading Edges */}
@@ -379,19 +465,22 @@
 
     // --- Services Section ---
     function Services() {
-      const services = [
-        { title: "Reparación de AC", icon: "Wrench", desc: "Diagnóstico rápido y reparación precisa. No pases calor, solucionamos tu problema el mismo día.", color: "text-[#FF3C00]" },
-        { title: "Instalación Minisplit", icon: "Snowflake", desc: "Sistemas ductless de alta eficiencia. Zonificación perfecta sin romper paredes.", color: "text-[#00B4FF]" },
-        { title: "Mantenimiento Preventivo", icon: "ShieldCheck", desc: "Extiende la vida útil de tus equipos y ahorra energía con nuestros planes anuales.", color: "text-[#C0C0C0]" },
-        { title: "Calefacción (Heating)", icon: "Sun", desc: "Bombas de calor y furnaces listos para proteger a tu familia del invierno en Texas.", color: "text-[#FF3C00]" },
-        { title: "Enfriamiento (Cooling)", icon: "Wind", desc: "Sistemas centrales de última generación para un confort total y silencioso.", color: "text-[#00B4FF]" }
-      ];
+      const { t } = useContext(LanguageContext);
+      
+      const icons = ["Wrench", "Snowflake", "ShieldCheck", "Sun", "Wind"];
+      const colors = ["text-[#FF3C00]", "text-[#00B4FF]", "text-[#C0C0C0]", "text-[#FF3C00]", "text-[#00B4FF]"];
+      
+      const services = t.services.items.map((item, i) => ({
+        ...item,
+        icon: icons[i],
+        color: colors[i]
+      }));
 
       return (
         <section id="servicios" className="py-24 px-4 lg:px-16 max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
-            <span className="text-sm font-body font-bold tracking-widest text-[#00B4FF] uppercase">Nuestra Especialidad</span>
-            <h2 className="font-heading italic text-5xl md:text-6xl text-[#1A1A1A] mt-4 tracking-[-1px]">Soluciones Climáticas</h2>
+            <span className="text-sm font-body font-bold tracking-widest text-[#00B4FF] uppercase">{t.services.subtitle}</span>
+            <h2 className="font-heading italic text-5xl md:text-6xl text-[#1A1A1A] mt-4 tracking-[-1px]">{t.services.title}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -445,11 +534,12 @@
 
     // --- Stats Band ---
     function StatsBand() {
+      const { t } = useContext(LanguageContext);
       const stats = [
-        { to: 500, suffix: "+", label: "Installations" },
-        { to: 24, suffix: "/7", label: "Availability" },
-        { to: 20, suffix: "+", label: "Years Experience" },
-        { to: 100, suffix: "%", label: "Licensed & Insured" }
+        { to: 500, suffix: "+", label: t.stats.items[0] },
+        { to: 24, suffix: "/7", label: t.stats.items[1] },
+        { to: 20, suffix: "+", label: t.stats.items[2] },
+        { to: 100, suffix: "%", label: t.stats.items[3] }
       ];
 
       return (
@@ -460,7 +550,7 @@
 
           <div className="max-w-7xl mx-auto px-4 lg:px-16 text-center relative z-10">
             <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="font-heading italic text-4xl md:text-5xl text-white mb-16 tracking-[-1px]">
-              Licensed, Insured, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00B4FF] to-blue-200">Houston-Proven</span>
+              {t.stats.title1} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00B4FF] to-blue-200">{t.stats.title2}</span>
             </motion.h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8">
               {stats.map((stat, i) => (
@@ -480,6 +570,7 @@
 
     // --- Projects & Gallery ---
     function ProjectsGallery() {
+      const { t } = useContext(LanguageContext);
       const galleryImages = [
         "assets/gallery/01-tuneup-tech.png",
         "assets/gallery/02-condenser-redbrick.png",
@@ -498,8 +589,8 @@
         <section id="proyectos" className="py-24 bg-white relative z-10 border-y border-gray-100">
           <div className="max-w-7xl mx-auto px-4 lg:px-16">
             <div className="text-center mb-16">
-              <span className="text-sm font-body font-bold tracking-widest text-[#C0C0C0] uppercase">Nuestro Trabajo</span>
-              <h2 className="font-heading italic text-5xl md:text-6xl text-[#1A1A1A] mt-4 tracking-[-1px]">Proyectos y Galería</h2>
+              <span className="text-sm font-body font-bold tracking-widest text-[#C0C0C0] uppercase">{t.gallery.subtitle}</span>
+              <h2 className="font-heading italic text-5xl md:text-6xl text-[#1A1A1A] mt-4 tracking-[-1px]">{t.gallery.title}</h2>
             </div>
 
             <div className="flex flex-col gap-8">
@@ -512,10 +603,10 @@
                   </div>
                 </div>
                 <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-                  <h3 className="font-heading italic text-3xl md:text-4xl text-[#1A1A1A] mb-4">Instalación Comercial y Residencial</h3>
-                  <p className="text-gray-600 font-body text-base leading-relaxed mb-6">Trabajo profesional y de alta calidad garantizado. Inspección detallada, diagnóstico preciso e instalación impecable en techos y áreas residenciales en todo Houston.</p>
+                  <h3 className="font-heading italic text-3xl md:text-4xl text-[#1A1A1A] mb-4">{t.gallery.mainTitle}</h3>
+                  <p className="text-gray-600 font-body text-base leading-relaxed mb-6">{t.gallery.mainDesc}</p>
                   <span className="text-[#00B4FF] font-bold text-sm tracking-wider uppercase flex items-center gap-2">
-                    Ver más detalles <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    {t.gallery.btnDetails} <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                   </span>
                 </div>
               </motion.div>
@@ -548,16 +639,13 @@
 
     // --- Testimonials ---
     function Testimonials() {
-      const testimonials = [
-        { name: "Michael T.", text: "Rápidos, limpios y muy profesionales. Solucionaron mi problema el mismo día.", stars: 5 },
-        { name: "Sarah J.", text: "Instalaron 3 minisplits en mi oficina. El trabajo impecable y los equipos son súper silenciosos.", stars: 5 },
-        { name: "David R.", text: "Excelente servicio de mantenimiento. Se nota la diferencia en la calidad del aire y en mi recibo de luz.", stars: 5 }
-      ];
+      const { t } = useContext(LanguageContext);
+      const testimonials = t.testimonials.reviews.map(r => ({ ...r, stars: 5 }));
 
       return (
         <section id="testimonials" className="py-24 max-w-7xl mx-auto px-4 lg:px-16 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="font-heading italic text-5xl md:text-6xl text-[#1A1A1A] tracking-[-1px]">Lo que dicen nuestros clientes</h2>
+            <h2 className="font-heading italic text-5xl md:text-6xl text-[#1A1A1A] tracking-[-1px]">{t.testimonials.title}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
@@ -581,27 +669,28 @@
 
     // --- Contact ---
     function Contact() {
+      const { t } = useContext(LanguageContext);
       return (
         <section id="contacto" className="py-24 bg-[#1A1A1A] text-white relative z-10">
           <div className="max-w-7xl mx-auto px-4 lg:px-16 grid grid-cols-1 lg:grid-cols-2 gap-16">
             <div>
-              <span className="text-xs font-body font-bold tracking-widest text-[#00B4FF] uppercase">Soporte 24/7</span>
-              <h2 className="font-heading italic text-5xl md:text-6xl mt-4 mb-6 tracking-[-1px]">Agenda tu Visita</h2>
-              <p className="text-gray-400 font-body mb-10 max-w-md text-lg">Nuestros expertos están listos para asistirte en todo Houston. Cotización sin compromiso.</p>
+              <span className="text-xs font-body font-bold tracking-widest text-[#00B4FF] uppercase">{t.contact.support}</span>
+              <h2 className="font-heading italic text-5xl md:text-6xl mt-4 mb-6 tracking-[-1px]">{t.contact.title}</h2>
+              <p className="text-gray-400 font-body mb-10 max-w-md text-lg">{t.contact.desc}</p>
               
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"><svg className="w-5 h-5 text-[#00B4FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
                   <div>
-                    <div className="text-xs text-gray-500 uppercase font-bold">Teléfono / WhatsApp</div>
+                    <div className="text-xs text-gray-500 uppercase font-bold">{t.contact.phoneTitle}</div>
                     <div className="text-xl font-bold">+1 (713) 555-0199</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"><svg className="w-5 h-5 text-[#FF3C00]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
                   <div>
-                    <div className="text-xs text-gray-500 uppercase font-bold">Área de Servicio</div>
-                    <div className="text-xl font-bold">Houston, TX & Alrededores</div>
+                    <div className="text-xs text-gray-500 uppercase font-bold">{t.contact.areaTitle}</div>
+                    <div className="text-xl font-bold">{t.contact.areaDesc}</div>
                   </div>
                 </div>
               </div>
@@ -610,12 +699,12 @@
             <div className="bg-[#222] rounded-3xl p-8 border border-white/10">
               <form className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <input type="text" placeholder="Nombre" className="bg-[#111] border border-white/10 rounded-xl px-4 py-3 w-full text-white focus:outline-none focus:border-[#00B4FF] transition-colors" />
-                  <input type="tel" placeholder="Teléfono" className="bg-[#111] border border-white/10 rounded-xl px-4 py-3 w-full text-white focus:outline-none focus:border-[#00B4FF] transition-colors" />
+                  <input type="text" placeholder={t.contact.form.name} className="bg-[#111] border border-white/10 rounded-xl px-4 py-3 w-full text-white focus:outline-none focus:border-[#00B4FF] transition-colors" />
+                  <input type="tel" placeholder={t.contact.form.phone} className="bg-[#111] border border-white/10 rounded-xl px-4 py-3 w-full text-white focus:outline-none focus:border-[#00B4FF] transition-colors" />
                 </div>
-                <input type="email" placeholder="Email" className="bg-[#111] border border-white/10 rounded-xl px-4 py-3 w-full text-white focus:outline-none focus:border-[#00B4FF] transition-colors" />
-                <textarea placeholder="¿En qué podemos ayudarte?" rows="4" className="bg-[#111] border border-white/10 rounded-xl px-4 py-3 w-full text-white focus:outline-none focus:border-[#00B4FF] transition-colors resize-none"></textarea>
-                <button type="button" className="w-full bg-gradient-to-r from-[#00B4FF] to-[#FF3C00] font-bold text-white py-4 rounded-xl hover:opacity-90 transition-opacity">Enviar Mensaje</button>
+                <input type="email" placeholder={t.contact.form.email} className="bg-[#111] border border-white/10 rounded-xl px-4 py-3 w-full text-white focus:outline-none focus:border-[#00B4FF] transition-colors" />
+                <textarea placeholder={t.contact.form.message} rows="4" className="bg-[#111] border border-white/10 rounded-xl px-4 py-3 w-full text-white focus:outline-none focus:border-[#00B4FF] transition-colors resize-none"></textarea>
+                <button type="button" className="w-full bg-gradient-to-r from-[#00B4FF] to-[#FF3C00] font-bold text-white py-4 rounded-xl hover:opacity-90 transition-opacity">{t.contact.form.submit}</button>
               </form>
             </div>
           </div>
@@ -625,26 +714,27 @@
 
     // --- Final CTA ---
     function FinalCTA() {
+      const { t } = useContext(LanguageContext);
       return (
         <section className="py-20 bg-white relative z-10 border-t border-gray-100">
           <div className="max-w-5xl mx-auto px-4 lg:px-16 text-center">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-gradient-to-br from-blue-50 via-white to-red-50 rounded-[2.5rem] p-10 md:p-16 border border-white shadow-2xl shadow-gray-200 relative overflow-hidden">
               <div className="absolute inset-0 bg-white/40 backdrop-blur-3xl -z-10"></div>
               
-              <h2 className="font-heading italic text-5xl md:text-6xl text-[#1A1A1A] mb-4 tracking-[-1px]">Ready to Fix Your Comfort?</h2>
-              <p className="text-gray-600 font-body text-lg md:text-xl mb-10 max-w-2xl mx-auto font-medium">Free estimates on all installations. No hidden fees. Financing available.</p>
+              <h2 className="font-heading italic text-5xl md:text-6xl text-[#1A1A1A] mb-4 tracking-[-1px]">{t.cta.title}</h2>
+              <p className="text-gray-600 font-body text-lg md:text-xl mb-10 max-w-2xl mx-auto font-medium">{t.cta.desc}</p>
               
               <a href="#contacto" className="inline-flex items-center gap-3 bg-[#1A1A1A] text-white px-8 py-4 rounded-full font-body font-bold text-lg hover:bg-gradient-to-r hover:from-[#00B4FF] hover:to-[#FF3C00] hover:scale-105 transition-all shadow-xl group">
-                Schedule Your Free Estimate
+                {t.cta.btn}
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </a>
               
               <div className="mt-10 pt-6 border-t border-gray-200/50 flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 text-xs font-body font-bold text-gray-500 uppercase tracking-widest">
-                <span>Licensed & Insured</span>
+                <span>{t.cta.tags[0]}</span>
                 <span className="hidden md:inline text-gray-300">•</span>
-                <span>Serving all of Greater Houston</span>
+                <span>{t.cta.tags[1]}</span>
                 <span className="hidden md:inline text-gray-300">•</span>
-                <span className="text-[#FF3C00]">Se Habla Español</span>
+                <span className="text-[#FF3C00]">{t.cta.tags[2]}</span>
               </div>
             </motion.div>
           </div>
@@ -654,6 +744,7 @@
 
     // --- Footer ---
     function Footer() {
+      const { t } = useContext(LanguageContext);
       return (
         <footer className="bg-[#111] pt-16 pb-8 border-t border-white/10 relative z-10 text-white">
           <div className="max-w-7xl mx-auto px-4 lg:px-16">
@@ -662,7 +753,7 @@
               <div>
                 <h3 className="font-heading italic text-2xl text-white mb-4">XMAX AIRCONDITIONER</h3>
                 <p className="text-gray-400 font-body text-sm mb-6 leading-relaxed">
-                  Expert HVAC services in Houston, TX. Delivering premium comfort, high efficiency, and reliable installations since day one.
+                  {t.footer.desc}
                 </p>
                 <div className="flex gap-4">
                   <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-[#00B4FF] hover:border-[#00B4FF] transition-all hover:scale-110">
@@ -676,7 +767,7 @@
               
               {/* Contact Links */}
               <div>
-                <h4 className="font-body font-bold text-sm tracking-widest text-[#C0C0C0] uppercase mb-6">Contact Us</h4>
+                <h4 className="font-body font-bold text-sm tracking-widest text-[#C0C0C0] uppercase mb-6">{t.footer.contactTitle}</h4>
                 <ul className="space-y-4 text-gray-400 font-body text-sm">
                   <li className="flex items-center gap-3 hover:text-white transition-colors cursor-pointer">
                     <svg className="w-4 h-4 text-[#00B4FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -710,8 +801,8 @@
             </div>
             
             <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-xs font-body">
-              <p>&copy; 2026 XMAX AIRCONDITIONER. Todos los derechos reservados.</p>
-              <p>Designed for excellence.</p>
+              <p>&copy; 2026 XMAX AIRCONDITIONER. {t.footer.rights}</p>
+              <p>{t.footer.designed}</p>
             </div>
           </div>
         </footer>
@@ -721,18 +812,20 @@
     // --- Main App ---
     function App() {
       return (
-        <div className="w-full font-body bg-[#F8F9FA]">
-          <Navbar />
-          <Hero />
-          <InfiniteMarquee />
-          <Services />
-          <StatsBand />
-          <ProjectsGallery />
-          <Testimonials />
-          <Contact />
-          <FinalCTA />
-          <Footer />
-        </div>
+        <LanguageProvider>
+          <div className="w-full font-body bg-[#F8F9FA]">
+            <Navbar />
+            <Hero />
+            <InfiniteMarquee />
+            <Services />
+            <StatsBand />
+            <ProjectsGallery />
+            <Testimonials />
+            <Contact />
+            <FinalCTA />
+            <Footer />
+          </div>
+        </LanguageProvider>
       );
     }
 
