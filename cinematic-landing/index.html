@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XMAX Airconditioner</title>
+  
+  <!-- THE EXACT TECHNICAL STACK FROM THE PROMPT -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/framer-motion/dist/framer-motion.js"></script>
+  
+  <!-- Plain Three.js for the 3D Hero without module hell -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['"Instrument Serif"', 'serif'],
+            body: ['"Barlow"', 'sans-serif'],
+          },
+          colors: {
+            blue: { 500: '#00B4FF' },
+            red: { 500: '#FF3C00' },
+            silver: { 400: '#C0C0C0', 200: '#E5E5E5' }
+          },
+          borderRadius: {
+            DEFAULT: '9999px',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Liquid Glass CSS (TROPICALIZADO A LIGHT THEME) -->
+  <style>
+    body { background-color: #F8F9FA; color: #111; margin: 0; padding: 0; overflow-x: hidden; }
+    
+    .liquid-glass {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: none;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.04), inset 0 1px 1px rgba(255,255,255,1);
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+    }
+    .liquid-glass::before {
+      content: "";
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      padding: 1.5px;
+      background: linear-gradient(180deg, rgba(192,192,192,0.4) 0%, rgba(255,255,255,0.8) 50%, rgba(229,229,229,0.4) 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- App Code -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    const MotionLib = window.FramerMotion || window.Motion;
+    const { motion, useInView } = MotionLib;
+
+    // Suppress warnings
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      if (typeof args[0] === 'string' && args[0].includes('key')) return;
+      originalConsoleError.apply(console, args);
+    };
+
+    // --- Hero Background with AI Generated Minisplit ---
+    function Hero3D() {
+      return (
+        <div className="absolute inset-0 w-full h-full bg-[#F8F9FA] overflow-hidden">
+          {/* We use the generated premium AI image that has the beautiful AC, floating particles and cinematic light */}
+          <motion.div
+            className="absolute inset-0 w-full h-full"
+            initial={{ scale: 1.05 }}
+            animate={{ 
+              scale: [1.05, 1.0, 1.05],
+              rotate: [0.5, -0.5, 0.5]
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <img 
+              src="ac-hero.png" 
+              alt="Premium Minisplit" 
+              className="w-full h-full object-cover opacity-90 mix-blend-multiply" 
+            />
+          </motion.div>
+        </div>
+      );
+    }
+
+    // --- BlurText Component (from the cinematic prompt) ---
+    function BlurText({ text, className }) {
+      const ref = useRef(null);
+      const isInView = useInView(ref, { once: true, amount: 0.1 });
+      const words = text.split(" ");
+      
+      const child = {
+        hidden: { filter: "blur(10px)", opacity: 0, y: 30 },
+        visible: (i) => ({
+          filter: ["blur(10px)", "blur(0px)"],
+          opacity: [0, 1],
+          y: [30, 0],
+          transition: { duration: 0.6, delay: (i * 100) / 1000, ease: "easeOut" }
+        })
+      };
+
+      return (
+        <p ref={ref} className={className} style={{ display: "flex", flexWrap: "wrap", rowGap: "0.1em" }}>
+          {words.map((word, i) => (
+            <motion.span key={i} custom={i} variants={child} initial="hidden" animate={isInView ? "visible" : "hidden"} style={{ marginRight: "0.28em" }}>
+              {word}
+            </motion.span>
+          ))}
+        </p>
+      );
+    }
+
+    // --- Navbar ---
+    function Navbar() {
+      return (
+        <nav className="fixed top-6 left-0 w-full px-8 lg:px-16 z-50 flex items-center justify-between">
+          <div className="h-14 w-40 liquid-glass flex items-center justify-center font-heading italic text-2xl px-4 shadow-xl">
+            <span style={{color: '#00B4FF'}}>XMAX</span> <span style={{color: '#FF3C00', marginLeft: '6px'}}>AC</span>
+          </div>
+
+          <div className="hidden md:flex liquid-glass px-2 py-2 items-center gap-2 shadow-xl">
+            {["Servicios", "Proyectos", "Galería", "Testimonials", "Contacto"].map((link, i) => (
+              <a key={i} href="#" className="px-4 py-2 text-sm font-semibold text-gray-800 font-body hover:text-[#00B4FF] transition-colors">
+                {link}
+              </a>
+            ))}
+            <button className="bg-gradient-to-r from-[#00B4FF] to-[#FF3C00] text-white px-5 py-2 text-sm font-bold font-body rounded-full ml-2 shadow-lg hover:opacity-90 transition-opacity">
+              Cotiza Ahora
+            </button>
+          </div>
+        </nav>
+      );
+    }
+
+    // --- Sections ---
+    function Hero() {
+      return (
+        <section className="relative w-full h-[100vh] flex flex-col justify-center overflow-hidden">
+          {/* Background */}
+          <Hero3D />
+          
+          {/* Content overlay */}
+          <div className="relative z-10 px-8 lg:px-16 max-w-4xl pointer-events-none mt-20">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+              className="inline-block px-4 py-1 liquid-glass mb-6 font-body text-xs font-bold tracking-widest text-gray-600 uppercase shadow-lg"
+            >
+              HEATING • COOLING • MAINTENANCE
+            </motion.div>
+            
+            <BlurText 
+              text="El Aire Perfecto para tu Hogar en Houston"
+              className="font-heading italic text-6xl md:text-[5rem] lg:text-[6rem] text-gray-900 leading-[0.9] tracking-[-2px] mb-6 drop-shadow-md"
+            />
+            
+            <motion.p 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
+              className="font-body text-lg text-gray-800 max-w-xl mb-8 font-semibold bg-white/50 backdrop-blur-md p-4 rounded-2xl"
+            >
+              Expertos en reparación, mantenimiento e instalación de Minisplit. Confort absoluto con estilo profesional y premium.
+            </motion.p>
+            
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="flex gap-4 pointer-events-auto">
+              <button className="bg-gray-900 text-white font-body font-bold px-8 py-4 rounded-full shadow-xl hover:bg-black transition-colors">Ver Servicios</button>
+              <button className="liquid-glass text-gray-900 font-body font-bold px-8 py-4 hover:bg-white transition-colors">Contáctanos Ahora</button>
+            </motion.div>
+          </div>
+        </section>
+      );
+    }
+
+    function Services() {
+      const cards = [
+        { title: "Reparación de AC", color: "#FF3C00", desc: "Servicio de emergencia rápido y preciso." },
+        { title: "Instalación Minisplit", color: "#00B4FF", desc: "Sistemas ductless de alta eficiencia térmica." },
+        { title: "Mantenimiento Preventivo", color: "#C0C0C0", desc: "Planes anuales para extender la vida de tu equipo." }
+      ];
+      return (
+        <section className="py-24 px-8 lg:px-16 w-full max-w-7xl mx-auto">
+          <BlurText text="Servicios Premium" className="font-heading italic text-5xl md:text-6xl text-gray-900 tracking-[-1px] mb-12" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {cards.map((c, i) => (
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i*0.2 }} viewport={{ once: true }}
+                className="liquid-glass p-8 flex flex-col justify-between min-h-[300px]"
+              >
+                <div style={{color: c.color}} className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-6 font-bold text-xl">
+                  {i+1}
+                </div>
+                <div>
+                  <h3 className="font-heading italic text-3xl text-gray-900 mb-2">{c.title}</h3>
+                  <p className="font-body text-gray-600">{c.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    // A simplified placeholder for Projects, Testimonials, Contact to complete the page
+    function OtherSections() {
+      return (
+        <div className="w-full max-w-7xl mx-auto px-8 lg:px-16 py-24 space-y-32">
+          {/* Projects */}
+          <section>
+            <BlurText text="Proyectos Recientes" className="font-heading italic text-5xl md:text-6xl text-gray-900 tracking-[-1px] mb-12" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="liquid-glass aspect-video border-2 border-[#E5E5E5] flex items-center justify-center text-gray-400 font-body">Imagen Antes/Después Houston</div>
+              <div className="liquid-glass aspect-video border-2 border-[#E5E5E5] flex items-center justify-center text-gray-400 font-body">Instalación Comercial Katy</div>
+            </div>
+          </section>
+
+          {/* Contact */}
+          <section className="liquid-glass p-12 text-center">
+            <h2 className="font-heading italic text-5xl text-gray-900 mb-6">Agenda tu visita técnica</h2>
+            <p className="font-body text-gray-600 mb-8 max-w-md mx-auto">Nuestros expertos están listos para asistirte. Servicio garantizado en todo Houston.</p>
+            <button className="bg-[#00B4FF] text-white font-body font-bold px-10 py-4 rounded-full shadow-lg hover:bg-[#0096d6]">
+              Llamar al (713) 555-0199
+            </button>
+          </section>
+        </div>
+      );
+    }
+
+    function App() {
+      return (
+        <div className="w-full min-h-screen">
+          <Navbar />
+          <Hero />
+          <Services />
+          <OtherSections />
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
